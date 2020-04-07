@@ -50,7 +50,6 @@ def load_data(directory):
             except KeyError:
                 pass
 
-
 def main():
     if len(sys.argv) > 2:
         sys.exit("Usage: python degrees.py [directory]")
@@ -95,41 +94,37 @@ def shortest_path(source, target):
     explored_nodes = []
 
     # first create source Node
-    if source != target:
-        start = Node(state=source,parent=None,action=None)
-    else:
+    if source == target:
         sys.exit("Source and target are the same person.")
-    # add source Node to frontier
-    frontier.add(start)
-    # remove Node from frontier (checking for empty status is implemented in remove())
-    explored_nodes.append(frontier.remove())
     # expand Node
     try:
-        neighbors = neighbors_for_person(person_id_for_name(explored_nodes[-1].state))
+        neighbors = neighbors_for_person(person_id_for_name(source))
     # iterate over neighbors
     for neighbor in neighbors:
         # check if neighbor is equal to target
         if neighbor[1] == target:
-            return [(neighbor[0],neighbor[1])]
+            return [(movies[neighbor[0]],names[neighbor[1]])]
         # if not equal: add as Node to frontier
         else:
-            frontier.add(Node(state=neighbor[1], parent=(front_node.state, neighbors[0]), action=neighbors[0]))
+            frontier.add(Node(state=neighbor[1], parent=None, action=neighbor[0]))
 
     target_missing = True
     while target_missing:
         # remove Node from frontier (checking for empty status is implemented in remove())
-        explored_nodes.append(frontier.remove())
+        node = frontier.remove()
+        explored_nodes.append(node)
         # expand Node
         try:
-            neighbors = neighbors_for_person(person_id_for_name(explored_nodes[-1].state))
+            neighbors = neighbors_for_person(person_id_for_name(node.state))
         # add resulting nodes to frontier
         for neighbor in neighbors:
             # check if neighbor is equal to target
             if neighbor[1] == target:
-                return [(neighbor[0],neighbor[1])]
+                explored_nodes.append(Node(state=neighbor[1], parent=(node.state,node.action), action=neighbors[0])))
+                return get_answer(explored_nodes)
             else:
-                frontier.add(Node(state=neighbor[1], parent=front_node.state, action=neighbors[0]))
-
+                frontier.add(Node(state=neighbor[1], parent=(node.state,node.action), action=neighbors[0]))
+    
 
 def person_id_for_name(name):
     """
