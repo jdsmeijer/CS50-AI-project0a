@@ -91,23 +91,44 @@ def shortest_path(source, target):
     If no possible path, returns None.
     """
 
-    # TODO
-    frontier = StackFrontier()
+    frontier = QueueFrontier()
     explored_nodes = []
-    starting_node = Node(state=None,parent=None,action=source)
-    frontier.add(starting_node)
-    frontier.remove()
-    neighbors = neighbors_for_person(person_id_for_name(frontier[:-1]))
-    for neighbor in neighbors:
-        frontier.add(neighbor[1])
-    if len(neighbors) == 0:
-        sys.exit("These actors did not connect. No solution.")
+
+    # first create source Node
+    if source != target:
+        start = Node(state=source,parent=None,action=None)
     else:
+        sys.exit("Source and target are the same person.")
+    # add source Node to frontier
+    frontier.add(start)
+    # remove Node from frontier (checking for empty status is implemented in remove())
+    explored_nodes.append(frontier.remove())
+    # expand Node
+    try:
+        neighbors = neighbors_for_person(person_id_for_name(explored_nodes[-1].state))
+    # iterate over neighbors
+    for neighbor in neighbors:
+        # check if neighbor is equal to target
+        if neighbor[1] == target:
+            return [(neighbor[0],neighbor[1])]
+        # if not equal: add as Node to frontier
+        else:
+            frontier.add(Node(state=neighbor[1], parent=(front_node.state, neighbors[0]), action=neighbors[0]))
 
-
-
-
-    raise NotImplementedError
+    target_missing = True
+    while target_missing:
+        # remove Node from frontier (checking for empty status is implemented in remove())
+        explored_nodes.append(frontier.remove())
+        # expand Node
+        try:
+            neighbors = neighbors_for_person(person_id_for_name(explored_nodes[-1].state))
+        # add resulting nodes to frontier
+        for neighbor in neighbors:
+            # check if neighbor is equal to target
+            if neighbor[1] == target:
+                return [(neighbor[0],neighbor[1])]
+            else:
+                frontier.add(Node(state=neighbor[1], parent=front_node.state, action=neighbors[0]))
 
 
 def person_id_for_name(name):
