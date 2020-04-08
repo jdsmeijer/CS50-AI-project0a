@@ -93,18 +93,18 @@ def shortest_path(source, target):
     frontier = QueueFrontier()
     explored_nodes = []
 
-    # first create source Node
+    # check if source != target
     if source == target:
         sys.exit("Source and target are the same person.")
     # expand Node
-    try:
-        neighbors = neighbors_for_person(person_id_for_name(source))
+    neighbors = neighbors_for_person(person_id_for_name(source))
     # iterate over neighbors
     for neighbor in neighbors:
         # check if neighbor is equal to target
         if neighbor[1] == target:
+            # if equal, return tuple with movie_id and actor_id
             return [(movies[neighbor[0]],names[neighbor[1]])]
-        # if not equal: add as Node to frontier
+        # if not equal: create Node and add to frontier
         else:
             frontier.add(Node(state=neighbor[1], parent=None, action=neighbor[0]))
 
@@ -116,15 +116,34 @@ def shortest_path(source, target):
         # expand Node
         try:
             neighbors = neighbors_for_person(person_id_for_name(node.state))
-        # add resulting nodes to frontier
+        # iterate over neighbors
         for neighbor in neighbors:
-            # check if neighbor is equal to target
+            # first check if neighbor is equal to target
             if neighbor[1] == target:
                 explored_nodes.append(Node(state=neighbor[1], parent=(node.state,node.action), action=neighbors[0])))
                 return get_answer(explored_nodes)
+            # if not equal, create Node and add to frontier
             else:
                 frontier.add(Node(state=neighbor[1], parent=(node.state,node.action), action=neighbors[0]))
-    
+
+def get_answer(explored_nodes):
+    answer = []
+    last_node = explored_nodes.pop()
+    node_ids = get_ids(last_node)
+    answer.append(node_ids)
+    while last_node.parent != None:
+        last_node = get_node(explored_nodes, last_node.parent)
+        node_ids = get_ids(last_node)
+        answer.append(node_ids)
+    return answer
+
+def get_node(explored_nodes, parent):
+    for node in Nodes:
+        if (node.state == parent[0]) and (node.action == parent[1]):
+            return node
+
+def get_ids(node):
+    return (movies[node.action],names[node.state])
 
 def person_id_for_name(name):
     """
