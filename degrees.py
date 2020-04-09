@@ -94,56 +94,58 @@ def shortest_path(source, target):
     explored_nodes = []
 
     # check if source != target
-    if source == target:
-        sys.exit("Source and target are the same person.")
+    #if source == target:
+    #    sys.exit("Source and target are the same person.")
     # expand Node
-    neighbors = neighbors_for_person(person_id_for_name(source))
+    neighbors = neighbors_for_person(source)
     # iterate over neighbors
     for neighbor in neighbors:
         # check if neighbor is equal to target
-        if neighbor[1] == target:
+        if people[neighbor[1]]["name"]  == target:
             # if equal, return tuple with movie_id and actor_id
-            return [(movies[neighbor[0]],names[neighbor[1]])]
+            print("Target returned")
+            return [(neighbor[0],neighbor[1])]
         # if not equal: create Node and add to frontier
         else:
+            print("Node added")
             frontier.add(Node(state=neighbor[1], parent=None, action=neighbor[0]))
 
     target_missing = True
+
     while target_missing:
         # remove Node from frontier (checking for empty status is implemented in remove())
         node = frontier.remove()
         explored_nodes.append(node)
         # expand Node
-        try:
-            neighbors = neighbors_for_person(person_id_for_name(node.state))
+        neighbors = neighbors_for_person(node.state)
         # iterate over neighbors
         for neighbor in neighbors:
             # first check if neighbor is equal to target
             if neighbor[1] == target:
-                explored_nodes.append(Node(state=neighbor[1], parent=(node.state,node.action), action=neighbors[0])))
-                return get_answer(explored_nodes)
+                explored_nodes.append(Node(state=neighbor[1], parent=(node.action, node.state), action=neighbor[0]))
+                target_missing = False
             # if not equal, create Node and add to frontier
             else:
-                frontier.add(Node(state=neighbor[1], parent=(node.state,node.action), action=neighbors[0]))
+                frontier.add(Node(state=neighbor[1], parent=(node.action, node.state), action=neighbor[0]))
+                people[neighbor[1]]["name"]
+
+    return get_answer(explored_nodes)
 
 def get_answer(explored_nodes):
     answer = []
     last_node = explored_nodes.pop()
-    node_ids = get_ids(last_node)
-    answer.append(node_ids)
+    answer.append(last_node.parent)
     while last_node.parent != None:
         last_node = get_node(explored_nodes, last_node.parent)
-        node_ids = get_ids(last_node)
-        answer.append(node_ids)
+        print(last_node.state)
+        if last_node.parent != None:
+            answer.append(last_node.parent)
     return answer
 
 def get_node(explored_nodes, parent):
-    for node in Nodes:
-        if (node.state == parent[0]) and (node.action == parent[1]):
+    for node in explored_nodes:
+        if (node.state == parent[1] and node.action == parent[0]):
             return node
-
-def get_ids(node):
-    return (movies[node.action],names[node.state])
 
 def person_id_for_name(name):
     """
@@ -169,7 +171,6 @@ def person_id_for_name(name):
         return None
     else:
         return person_ids[0]
-
 
 def neighbors_for_person(person_id):
     """
