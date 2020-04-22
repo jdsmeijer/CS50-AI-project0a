@@ -113,21 +113,24 @@ def shortest_path(source, target):
     while target_missing:
         # remove Node from frontier (checking for empty status is implemented in remove())
         node = frontier.remove()
-        explored_nodes.append(node)
-        explored_actors.extend([node.state])
-        # expand Node
-        neighbors = neighbors_for_person(node.state)
-        # iterate over neighbors
-        for neighbor in neighbors:
-            # first check if neighbor is equal to target
-            if neighbor[1] == target:
-                explored_nodes.append(Node(state=neighbor[1], parent=(node.action, node.state), action=neighbor[0]))
-                target_missing = False
-                return get_answer(explored_nodes)
-            # if not equal, create Node and add to frontier
-            elif (neighbor[1] != source and neighbor[1] not in explored_actors):
-                frontier.add(Node(state=neighbor[1], parent=(node.action, node.state), action=neighbor[0]))
-                explored_actors.append(neighbor[1])
+        if node == None:
+            return None
+        else:
+            explored_nodes.append(node)
+            explored_actors.extend([node.state])
+            # expand Node
+            neighbors = neighbors_for_person(node.state)
+            # iterate over neighbors
+            for neighbor in neighbors:
+                # first check if neighbor is equal to target
+                if neighbor[1] == target:
+                    explored_nodes.append(Node(state=neighbor[1], parent=(node.action, node.state), action=neighbor[0]))
+                    target_missing = False
+                    return get_answer(explored_nodes)
+                # if not equal, create Node and add to frontier
+                elif (neighbor[1] != source and neighbor[1] not in explored_actors):
+                    frontier.add(Node(state=neighbor[1], parent=(node.action, node.state), action=neighbor[0]))
+                    explored_actors.append(neighbor[1])
 
 def get_answer(explored_nodes):
     answer = []
